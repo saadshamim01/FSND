@@ -279,30 +279,6 @@ def edit_artist(artist_id):
   return render_template('forms/edit_artist.html', form=form, artist=artist)
 
 
-#@app.route('/artists/<int:artist_id>/edit', methods=['POST'])
-#def edit_artist_submission(artist_id):
-#  artist=Artist.query.first_or_404(artist_id)
-#  form=ArtistForm(request.form)
-#  try:
-#    artist.name = form.name.data
-#    artist.genres = form.genres.data
-#    artist.city = form.city.data
-#    artist.state = form.state.data
-#    artist.phone = form.phone.data
-#    artist.website_link = form.website_link.data
-#    artist.facebook_link = form.facebook_link.data
-#    artist.image_link = form.image_link.data
-#    artist.seeking_venue = form.seeking_venue.data
-#    artist.seeking_description = form.seeking_description.data
-#    db.session.commit()
-#    flash("It was successful")
-#  except:
-#    flash("It was unsuccessful")
-#  finally:
-#    db.session.close()
-#  return redirect(url_for('show_artist', artist_id=artist_id))
-
-
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
   artist = Artist.query.first_or_404(artist_id)
@@ -333,45 +309,45 @@ def edit_artist_submission(artist_id):
       flash('Errors ' + str(message))
 
 
-
-#artist = Artist.query.first_or_404(artist_id)
-#form = ArtistForm(request.form, meta={'csrf': False})
-#if form.validate():
-#    try:
-#        artist.name = form.name.data
-#        artist.city = form.city.data
-#        ...
-#    except ValueError as e:
-#        print(e)
-#        ...
-#    finally:
-#        db.session.close()
-#else:
-#    message = []
-#    for field, err in form.errors.items():
-#        message.append(field + ' ' + '|'.join(err))
-#    flash('Errors ' + str(message))
-
-
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
-  venue=Venue.query.filter_by(id=venue_id).first_or_404()
+  venue = Venue.query.get(venue_id)
+  if venue is None:
+    abort(404)
   form = VenueForm(obj=venue)
   return render_template('forms/edit_venue.html', form=form, venue=venue)
 
+
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
-#  venue=Venue.query.first_or_404(venue_id)
-#  form=Venue.form(request.form)
-#  try:
-#    venue.name = form.name.data
-#    venue.genres = form.genres.data
-#    venue.city = form.city.data
-#    venue.state = form.state.data
-#    venue.address = form.address.data
+  venue=Venue.query.first_or_404(venue_id)
+  form=VenueForm(request.form, meta={'csrf': False})
+  if form.validate():
+    try:
+      venue.name = form.name.data
+      venue.city = form.city.data
+      venue.state = form.state.data
+      venue.address = form.address.data
+      venue.genres = form.genres.data
+      venue.phone = form.phone.data
+      venue.image_link = form.image_link.data
+      venue.facebook_link = form.facebook_link.data
+      venue.website_link = form.website_link.data
+      venue.seeking_talent = form.seeking_talent.data
+      venue.seeking_description = form.seeking_description.data
+      db.session.commit()
+      flash("It was successful")
+    except ValueError as e:
+      print(e)
+    finally:
+      db.session.close()
+    return redirect(url_for('show_venue', venue_id=venue_id))
+  else:
+    message = []
+    for field, err in form.errors.items():
+      message.append(field + ' ' + '|' .join(err))
+      flash('Errors ' + str(message))
 
-
-  return redirect(url_for('show_venue', venue_id=venue_id))
 
 #  Create Artist
 #  ----------------------------------------------------------------
