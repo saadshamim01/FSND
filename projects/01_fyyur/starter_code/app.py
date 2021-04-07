@@ -41,7 +41,7 @@ class Show(db.Model):
         'Venue.id'), nullable=False)
   artist_id = db.Column(db.Integer, db.ForeignKey(
         'Artist.id'), nullable=False)
-  Start_time = db.Column(db.DateTime, nullable=False)
+  start_time = db.Column(db.DateTime, nullable=False)
 
   def __repr__():
     return f'<Show Id: {self.id} Venue_ID: {self.venue_id}, Artist_ID: {self.artist_id}>'
@@ -196,9 +196,20 @@ def create_venue_submission():
   seeking_talent = request.form['seeking_talent']
   seeking_description = request.form['seeking_description']
 
+#  name = request.form.get('name')
+#  city = request.form.get('city')
+#  state = request.form.get('state')
+#  address = request.form.get('address')
+#  phone = request.form.get('phone')
+#  genres = request.form.get('genres')
+#  facebook_link = request.form.get('facebook_link')
+#  image_link = request.form.get('image_link')
+#  website_link = request.form.get('website_link')
+#  seeking_talent = request.form.get('seeking_talent', False)
+#  seeking_description = request.form.get('seeking_description')
 
   try:
-    db.session.add(Venue(id=id, name=name, city=city, state=state, address=address, phone=phone, genres=genres,
+    db.session.add(Venue(name=name, city=city, state=state, address=address, phone=phone, genres=genres,
                      facebook_link=facebook_link, image_link=image_link, website_link=website_link, seeking_talent=seeking_talent,
                      seeking_description=seeking_description))
     db.session.commit()
@@ -211,6 +222,7 @@ def create_venue_submission():
     flash('An error occured. Venue ' + request.form['name'] + ' could not be succesfully listed.')
     db.session.close()
     return render_template('pages/home.html')
+
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
@@ -226,13 +238,6 @@ def delete_venue(venue_id):
     #flash('Venue ' + request.form['name'] + ' was couldnt be successfully deleted!')
   finally:
     db.session.close()
-
-
-  # TODO: Complete this endpoint for taking a venue_id, and using
-  # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
-
-  # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
-  # clicking that button delete it from the db then redirect the user to the homepage
   return None
 
 
@@ -360,6 +365,31 @@ def create_artist_form():
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
 
+  a_error = False
+  a_name = request.form['name']
+  a_city = request.form['city']
+  a_state = request.form['state']
+  a_phone = request.form['phone']
+  a_genres = request.form['genres']
+  a_facebook_link = request.form['facebook_link']
+  a_image_link = request.form['image_link']
+  a_website_link = request.form['website_link']
+  a_seeking_venue = request.form['seeking_venue']
+  a_seeking_description = request.form['seeking_description']
+  try:
+    db.session.add(Artist(name=a_name, city=a_city, state=a_state, phone=a_phone, genres=a_genres,
+                          facebook_link=a_facebook_link, image_link=a_image_link, website_link=a_website_link,
+                          seeking_venue=a_seeking_venue, seeking_description=a_seeking_description))
+    db.session.commit()
+    flash('Artist' + request.form['name'] + ' was successfully listed.')
+
+  except:
+    flash('Unsuccessful')
+
+
+
+
+
 
   # on successful db insert, flash success
   flash('Artist ' + request.form['name'] + ' was successfully listed!')
@@ -367,6 +397,29 @@ def create_artist_submission():
   # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
   return render_template('pages/home.html')
 
+
+#@app.route('/venues/create', methods=['POST'])
+#def create_venue_submission():
+#  error = False
+#  name = request.form['name']
+#  city = request.form['city']
+#  state = request.form['state']
+#  address = request.form['address']
+#  phone = request.form['phone']
+#  genres = request.form['genres']
+#  facebook_link = request.form['facebook_link']
+#  image_link = request.form['image_link']
+#  website_link = request.form['website_link']
+#  seeking_talent = request.form['seeking_talent']
+#  seeking_description = request.form['seeking_description']
+#
+#
+#  try:
+#    db.session.add(Venue(id=id, name=name, city=city, state=state, address=address, phone=phone, genres=genres,
+#                     facebook_link=facebook_link, image_link=image_link, website_link=website_link, seeking_talent=seeking_talent,
+#                     seeking_description=seeking_description))
+#    db.session.commit()
+#    flash('Venue' + request.form['name'] + ' was successfully listed!')
 
 
 #  Shows
