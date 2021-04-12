@@ -123,26 +123,47 @@ def index():
 #  Venues
 #  ----------------------------------------------------------------
 
+#@app.route('/venues')
+#def venues():
+#  try:
+#    distinct_state_city = Venue.query.distinct(Venue.city, Venue.state).all()
+#    data = []
+#    for state_city in distinct_state_city:
+#        venues = Venue.query.filter(Venue.state == state_city.state, Venue.city == state_city.city).all()
+#        venues_data_with_num_upcoming_shows = []
+#        for venue in venues:
+#            venues_data_with_num_upcoming_shows.append(
+#                venue.serialize_with_num_upcoming_shows)
+#        data.append({
+#            'state': state_city.state,
+#            'city': state_city.city,
+#            'venues': venues_data_with_num_upcoming_shows
+#        })
+#    return render_template('pages/venues.html', areas=data)
+#  except:
+#    flash('Something went wrong please try again later, see you soon!')
+#    return render_template("pages/home.html")
+
 @app.route('/venues')
 def venues():
   try:
-    distinct_state_city = Venue.query.distinct(Venue.city, Venue.state).all()
     data = []
-    for state_city in distinct_state_city:
-        venues = Venue.query.filter(Venue.state == state_city.state, Venue.city == state_city.city).all()
-        venues_data_with_num_upcoming_shows = []
-        for venue in venues:
-            venues_data_with_num_upcoming_shows.append(
-                venue.serialize_with_num_upcoming_shows)
-        data.append({
-            'state': state_city.state,
-            'city': state_city.city,
-            'venues': venues_data_with_num_upcoming_shows
-        })
+    venues = Venue.query.all()
+    places = Venue.query.distinct(Venue.city, Venue.state).all()
+    for place in places:
+      data.append({
+                  'city': place.city,
+                  'state': place.state,
+                  'venues': [{
+                  'id': venue.id,
+                  'name': venue.name,
+                  'num_upcoming_shows': len([show for show in venue.shows if show.start_time > datetime.now()])
+                  } for venue in venues if
+                  venue.city == place.city and venue.state == place.state]
+                  })
     return render_template('pages/venues.html', areas=data)
   except:
-    flash('Something went wrong please try again later, see you soon!')
-    return render_template("pages/home.html")
+    flash('Unable to find the venue, please try later!')
 
 
 @app.route('/venues/search', methods=['POST'])
