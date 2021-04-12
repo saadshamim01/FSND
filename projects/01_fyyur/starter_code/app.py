@@ -15,6 +15,7 @@ from flask_migrate import Migrate
 from alembic import op
 from forms import *
 from flask import abort
+from datetime import datetime
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -61,7 +62,6 @@ class Venue(db.Model):
     seeking_description = db.Column(db.String(500))
     shows = db.relationship('Show', backref='Venue', lazy=True, cascade='all, delete-orphan')
 
-    @property
     def serialize_with_num_upcoming_shows(self):
         return {
         'id': self.id,
@@ -129,8 +129,7 @@ def venues():
     distinct_state_city = Venue.query.distinct(Venue.city, Venue.state).all()
     data = []
     for state_city in distinct_state_city:
-        venues = Venue.query.filter(
-            Venue.state == state_city.state, Venue.city == state_city.city).all()
+        venues = Venue.query.filter(Venue.state == state_city.state, Venue.city == state_city.city).all()
         venues_data_with_num_upcoming_shows = []
         for venue in venues:
             venues_data_with_num_upcoming_shows.append(
@@ -164,7 +163,49 @@ def search_venues():
 
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
-  data = Venue.query.get(venue_id)
+  #data = Venue.query.get(venue_id)
+  venue = Venue.query.filter_by(id=venue_id).first_or_404()
+
+  past_show =  db.session.query(Artist, Show).join(Show).join(Venue).filter(
+                                                                             Show.venue_id == venue_id,
+                                                                             Show.artist_id == Artist.id,
+                                                                             Show.start_time < datetime.now()).all()
+
+  upcoming_shows = db.session.query(Artist, Show).join(Show).join(Venue).filter(Show.venue_id == venue_id,
+                                                                                 Show.artist_id == Artist.id,
+                                                                                 Show.start_time > datetime.now()).all()
+
+  data = {
+  'id': venue.id,
+  'name': venue.name,
+  'city': venue.city,
+  'state': venue.state,
+  'address': venue.address,
+  'phone': venue.phone,
+  'genres': venue.genres,
+  'facebook_link': venue.facebook_link,
+  'image_link': venue.image_link,
+  'website_link': venue.website_link,
+  'seeking_talent': venue.seeking_talent,
+  'seeking_description': venue.seeking_description,
+  'past_shows': list([{
+                     'artist_id': artist.id,
+                     'artist_name': artist.name,
+                     'artist_image_link': artist.image_link,
+                     'start_time': show.start_time.strftime("%m/%d/%Y, %H:%M")
+                     } for artist, show in past_shows]),
+  'upcoming_shows': list([{
+                         'artist_id': artist.id,
+                         'artist_name': artist.name,
+                         'artist_image_link': artist.image_link,
+                         'start_time': show.start_time.strftime("%m/%d/%Y, %H:%M")
+                         } for artist, show in upcoming_shows]),
+  'past_shows_count': len(past_shows),
+  'upcoming_shows_count': len(upcoming_shows)
+
+  }
+
+
   return render_template('pages/show_venue.html', venue=data)
 
 #  Create Venue

@@ -93,8 +93,22 @@ def create_app(test_config=None):
                    'questions': current_questions,
                    'total_questions': len(Question.query.all()),
                    'categories': formatted_categories,
-                   'currentCategory': {}
+                   'currentCategory': None
                      }), 200
+
+    return jsonify({
+
+#'success': True,
+#
+#'questions': current_questions,
+#
+#'categories': current_categories,
+#
+#'total_questions': len(Question.query.all()),
+#
+#'current_category': None
+
+})
 
 
 #curl : curl http://127.0.0.1:5000/questions\?page\=2
@@ -241,33 +255,33 @@ def create_app(test_config=None):
   and shown whether they were correct or not.
   '''
 
-  @app.route('/quiz', methods=['GET'])
-  def play_quiz():
-    body = request.get_json()
-    previous_questions = body.get('previous_questions', [])
-    quiz_category = body.get('quiz_category', None)
-
-    try:
-      if quiz_category['id'] == 0:
-        quiz = Question.query.all()
-      else:
-        quiz = Question.query.filter_by(category=quiz_category['id'].all())
-      if not quiz:
-        return abort(422)
-
-      selected = []
-      for question in quiz:
-        if question.id not in previous_questions:
-          selected.append(question.format())
-      if len(selected) != 0:
-        result = random.choice(selected)
-        return jsonify({
-                       'question': result
-                       })
-      else:
-        return jsonify({
-                       'question': False
-                       })
+#  @app.route('/quiz', methods=['GET'])
+#  def play_quiz():
+#    body = request.get_json()
+#    previous_questions = body.get('previous_questions', [])
+#    quiz_category = body.get('quiz_category', None)
+#
+#    try:
+#      if quiz_category['id'] == 0:
+#        quiz = Question.query.all()
+#      else:
+#        quiz = Question.query.filter_by(category=quiz_category['id'].all())
+#      if not quiz:
+#        return abort(422)
+#
+#      selected = []
+#      for question in quiz:
+#        if question.id not in previous_questions:
+#          selected.append(question.format())
+#      if len(selected) != 0:
+#        result = random.choice(selected)
+#        return jsonify({
+#                       'question': result
+#                       })
+#      else:
+#        return jsonify({
+#                       'question': False
+#                       })
 
 #  '''
 #  @TODO:
