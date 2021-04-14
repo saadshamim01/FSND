@@ -187,7 +187,7 @@ def show_venue(venue_id):
   #data = Venue.query.get(venue_id)
   venue = Venue.query.filter_by(id=venue_id).first_or_404()
 
-  past_show =  db.session.query(Artist, Show).join(Show).join(Venue).filter(
+  past_shows =  db.session.query(Artist, Show).join(Show).join(Venue).filter(
                                                                              Show.venue_id == venue_id,
                                                                              Show.artist_id == Artist.id,
                                                                              Show.start_time < datetime.now()).all()
@@ -307,8 +307,48 @@ def search_artists():
 
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
-  artist = Artist.query.get(artist_id)
-  return render_template('pages/show_artist.html', artist=artist)
+  #artist = Artist.query.get(artist_id)
+  #return render_template('pages/show_artist.html', artist=artist)
+  artist = Artist.query.filter_by(id=artist_id).first_or_404()
+
+  past_shows =  db.session.query(Venue, Show).join(Show).join(Artist).filter(Show.artist_id == artist_id,
+                                                                             Show.venue_id == Venue.id,
+                                                                             Show.start_time < datetime.now()).all()
+
+  print(past_shows)
+  upcoming_shows = db.session.query(Venue, Show).join(Show).join(Artist).filter(Show.artist_id == artist_id,
+                                                                                Show.venue_id == Venue.id,
+                                                                                Show.start_time > datetime.now()).all()
+
+  data = {
+  'id': artist.id,
+  'name': artist.name,
+  'city': artist.city,
+  'state': artist.state,
+  'phone': artist.phone,
+  'genres': artist.genres,
+  'facebook_link': artist.facebook_link,
+  'image_link': artist.image_link,
+  'website_link': artist.website_link,
+  'seeking_venue': artist.seeking_venue,
+  'seeking_description': artist.seeking_description,
+  'past_shows': list([{
+                     'venue_id': venue.id,
+                     'venue_name': venue.name,
+                     'venue_image_link': venue.image_link,
+                     'start_time': show.start_time.strftime("%m/%d/%Y, %H:%M")
+                     } for venue, show in past_shows]),
+  'upcoming_shows': list([{
+                         'venue_id': venue.id,
+                         'venue_name': venue.name,
+                         'venue_image_link': venue.image_link,
+                         'start_time': show.start_time.strftime("%m/%d/%Y, %H:%M")
+                         } for venue, show in upcoming_shows]),
+  'past_shows_count': len(past_shows),
+  'upcoming_shows_count': len(upcoming_shows)
+
+  }
+  return render_template('pages/show_artist.html', artist=data)
 
 
 #  ----------------------------------------------------------------
@@ -433,7 +473,40 @@ def shows():
   # displays list of shows at /shows
   # TODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
-
+  #show = Show.query.order_by('id').all()
+  #show = Show.query.join(Venue, Show.venue_id == Venue.id).join(Artist, Artist.id == Show.artist_id).all()
+  #print(show)
+  #return {
+  #"venue_id": show.venue_id,
+  #"venue_name": show.venue.name,
+  #"artist_id": show.artist_id,
+  #"artist_name": show.artist.name,
+  #"artist_image_link": show.artist.image_link,
+  #"start_time": str(show.start_time)
+  #}
+  result = []
+  shows = Show.query.join(Venue, Show.venue_id == Venue.id).join(Artist, Artist.id == Show.artist_id).all()
+  for show in shows:
+    print(show.artist.name)
+    showObj = {"venue_id": show.venue_id,
+    "venue_name": show.venue.name,
+    "artist_id": show.artist_id,
+    "artist_name": show.artist.name,
+    "artist_image_link": show.artist.image_link,
+    "start_time": str(show.start_time)
+    }
+    result.append(showObj)
+    return render_template('pages/shows.html', shows=result)
+  #a = show[0]
+  #print (a)
+  #return {
+  #'venue_id':
+  #'venue_name':
+  #'artist_id':
+  #'artist_name':
+  #'artist_image_link':
+  #'start_time':
+  #}
   data=[{
     "venue_id": 1,
     "venue_name": "The Musical Hop",
