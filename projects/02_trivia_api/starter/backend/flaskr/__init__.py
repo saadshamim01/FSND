@@ -58,11 +58,11 @@ def create_app(test_config=None):
     #categories = [category.format() for category in cat]
     categories_dict = {}
     for category in cat:
-      categories_dict[category_id] = category.type
+      categories_dict[category.id] = category.type
     return jsonify({
           "success": True,
-          "categories": categories,
-          "total_categories": len(categories)
+          "categories": categories_dict,
+          "total_categories": len(categories_dict)
       }), 200
 
 #    #THEN CURL USING curl -X GET http://127.0.0.1:5000/categories
@@ -89,7 +89,7 @@ def create_app(test_config=None):
     #formatted_categories = [category.format() for category in categories]
     categories_dict = {}
     for category in categories:
-      categories_dict[category_id] = category.type
+      categories_dict[category.id] = category.type
 
     if len(current_questions) == 0:
       abort(404)
@@ -98,7 +98,7 @@ def create_app(test_config=None):
                    'success': True,
                    'questions': current_questions,
                    'total_questions': len(Question.query.all()),
-                   'categories': formatted_categories,
+                   'categories': categories_dict,
                    'currentCategory': None
                      }), 200
 
