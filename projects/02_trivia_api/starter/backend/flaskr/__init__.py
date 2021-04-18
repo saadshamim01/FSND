@@ -102,9 +102,7 @@ def create_app(test_config=None):
                    'currentCategory': None
                      }), 200
 
-    return jsonify({
 
-})
 
 
 #curl : curl http://127.0.0.1:5000/questions\?page\=2
@@ -190,26 +188,28 @@ def create_app(test_config=None):
   Try using the word "title" to start.
   '''
 
-  @app.route('/search', methods=['POST'])
+  @app.route('/questions/search', methods=['POST'])
   def search_question():
     body = request.get_json()
-    search = body.get('search', None)
+    print(body)
+    search = body.get('searchTerm', None)
+    if not search:
+            abort(422)
+    print(search)
 
     try:
-      selection = Question.query.order_by(Question.id).filter(Question.question.ilike('%{}%'.format(search)))
+      selection = Question.query.filter(Question.question.ilike('%{}%'.format(search))).all()
       current_questions = paginate_questions(request, selection)
+      print(current_questions)
       return jsonify({
                      'success': True,
-                     'question': current_questions,
+                     'questions': current_questions,
                      'total_questions': len(selection),
                      'current_category': None
                      })
+
     except:
       abort(404)
-#
-#
-##curl http://127.0.0.1:5000/questions/search -X POST -H "Content-Type: application/json" -d "{\"search\": \"organ\"}"
-#curl -d '{"search": "organ"}' -H 'Content-Type: application/json' -X POST http://127.0.0.1:5000/questions/search
 
 #  '''
 #  @TODO:
@@ -235,7 +235,6 @@ def create_app(test_config=None):
                    'total_questions': len(current_questions)
                    })
 
-
     #curl -X GET http://127.0.0.1:5000/categories/4
 
 
@@ -251,33 +250,37 @@ def create_app(test_config=None):
   and shown whether they were correct or not.
   '''
 
-#  @app.route('/quiz', methods=['GET'])
-#  def play_quiz():
-#    body = request.get_json()
-#    previous_questions = body.get('previous_questions', [])
-#    quiz_category = body.get('quiz_category', None)
-#
-#    try:
-#      if quiz_category['id'] == 0:
-#        quiz = Question.query.all()
-#      else:
-#        quiz = Question.query.filter_by(category=quiz_category['id'].all())
-#      if not quiz:
-#        return abort(422)
-#
-#      selected = []
-#      for question in quiz:
-#        if question.id not in previous_questions:
-#          selected.append(question.format())
-#      if len(selected) != 0:
-#        result = random.choice(selected)
-#        return jsonify({
-#                       'question': result
-#                       })
-#      else:
-#        return jsonify({
-#                       'question': False
-#                       })
+  @app.route('/quizzes', methods=['POST'])
+  def play_quiz():
+    body = request.get_json()
+    previous_questions = body.get('previous_questions', [])
+    quiz_category = body.get('quiz_category', None)
+    number = quiz_category['id']
+    print (number)
+    try:
+      quiz = Question.query.filter_by(category=number).all()
+
+      #To check if the questions are loaded, error checking.
+      if not quiz:
+        return abort(422)
+
+
+      selected_questions = []
+      for question in quiz:
+        if question.id not in previous_questions:
+          selected_questions.append(question.format())
+      if len(selected_questions) != 0:
+        results = random.choice(selected_questions)
+        return jsonify({
+                       'question': results
+                       })
+      else:
+        return jsonify({
+                       'question': False
+                       })
+    except:
+      flash('Unable to load questions.')
+
 
 #  '''
 #  @TODO:

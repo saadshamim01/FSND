@@ -92,7 +92,7 @@ class Artist(db.Model):
     shows = db.relationship('Show', backref='Artist', lazy=True, cascade='all, delete-orphan')
 
     def __repr__(self):
-      return f'<Venue {self.id} {self.name} {self.city} {self.state} {self.address}>'
+      return f'<Venue {self.id} {self.name} {self.city} {self.state} >'
 
 
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
@@ -470,80 +470,25 @@ def create_artist_submission():
 #
 @app.route('/shows')
 def shows():
-  # displays list of shows at /shows
-  # TODO: replace with real venues data.
-  #       num_shows should be aggregated based on number of upcoming shows per venue.
-  #show = Show.query.order_by('id').all()
-  #show = Show.query.join(Venue, Show.venue_id == Venue.id).join(Artist, Artist.id == Show.artist_id).all()
-  #print(show)
-  #return {
-  #"venue_id": show.venue_id,
-  #"venue_name": show.venue.name,
-  #"artist_id": show.artist_id,
-  #"artist_name": show.artist.name,
-  #"artist_image_link": show.artist.image_link,
-  #"start_time": str(show.start_time)
-  #}
   result = []
-  shows = Show.query.join(Venue, Show.venue_id == Venue.id).join(Artist, Artist.id == Show.artist_id).all()
-  for show in shows:
-    print(show.artist.name)
-    showObj = {"venue_id": show.venue_id,
-    "venue_name": show.venue.name,
+  #Query: where we wanted to get dat from Venue, Artist and Show Model.
+  shows_list = Show.query.join(Venue, Show.venue_id == Venue.id).join(Artist, Artist.id == Show.artist_id).filter(Show.start_time > datetime.now()).all()
+  #Looping over the list of shows.
+  for show in shows_list:
+    compound = {
+    "venue_id": show.venue_id,
+    "venue_name": show.Venue.name,
     "artist_id": show.artist_id,
-    "artist_name": show.artist.name,
-    "artist_image_link": show.artist.image_link,
+    "artist_name": show.Artist.name,
+    "artist_image_link": show.Artist.image_link,
+    #Converting it to string, because frontend cant handle datetime.
     "start_time": str(show.start_time)
     }
-    result.append(showObj)
-    return render_template('pages/shows.html', shows=result)
-  #a = show[0]
-  #print (a)
-  #return {
-  #'venue_id':
-  #'venue_name':
-  #'artist_id':
-  #'artist_name':
-  #'artist_image_link':
-  #'start_time':
-  #}
-  data=[{
-    "venue_id": 1,
-    "venue_name": "The Musical Hop",
-    "artist_id": 4,
-    "artist_name": "Guns N Petals",
-    "artist_image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80",
-    "start_time": "2019-05-21T21:30:00.000Z"
-  }, {
-    "venue_id": 3,
-    "venue_name": "Park Square Live Music & Coffee",
-    "artist_id": 5,
-    "artist_name": "Matt Quevedo",
-    "artist_image_link": "https://images.unsplash.com/photo-1495223153807-b916f75de8c5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80",
-    "start_time": "2019-06-15T23:00:00.000Z"
-  }, {
-    "venue_id": 3,
-    "venue_name": "Park Square Live Music & Coffee",
-    "artist_id": 6,
-    "artist_name": "The Wild Sax Band",
-    "artist_image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
-    "start_time": "2035-04-01T20:00:00.000Z"
-  }, {
-    "venue_id": 3,
-    "venue_name": "Park Square Live Music & Coffee",
-    "artist_id": 6,
-    "artist_name": "The Wild Sax Band",
-    "artist_image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
-    "start_time": "2035-04-08T20:00:00.000Z"
-  }, {
-    "venue_id": 3,
-    "venue_name": "Park Square Live Music & Coffee",
-    "artist_id": 6,
-    "artist_name": "The Wild Sax Band",
-    "artist_image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
-    "start_time": "2035-04-15T20:00:00.000Z"
-  }]
-  return render_template('pages/shows.html', shows=data)
+    result.append(compound)
+  #print(compound)
+  return render_template('pages/shows.html', shows=result)
+
+
 
 @app.route('/shows/create')
 def create_shows():
@@ -568,7 +513,7 @@ def create_show_submission():
     flash('An error occured')
   return render_template('pages/home.html')
 
-
+#Handling error.
 @app.errorhandler(404)
 def not_found_error(error):
     return render_template('errors/404.html'), 404
