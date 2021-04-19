@@ -79,16 +79,37 @@ def get_drinks_detail():
         or appropriate status code indicating reason for failure
 '''
 
+#@app.route('/drinks', methods = ['POST'])
+##@requires_auth('post:drinks')
+#def create_drinks():
+#    body = request.get_json()
+#
+#    new_title = body.get('title', None)
+#    new_recipe = body.get('recipe', None)
+#
+#    try:
+#        drink = Drink(title = new_title, recipe = new_recipe)
+#        drink.insert()
+#        return jsonify({"success": True,
+#                        "drinks": drink.long()
+#                        }), 200
+#    except Exception as e:
+#        print(e)
+#        abort(422)
+
 @app.route('/drinks', methods = ['POST'])
 #@requires_auth('post:drinks')
-def create_drinks():
-    body = request.get_json()
-
+def create_drinks(self):
+    body = dict(request.form or request.json or request.data)
+    print(body)
     new_title = body.get('title', None)
+    print(new_title)
     new_recipe = body.get('recipe', None)
+    print(new_recipe)
 
     try:
         drink = Drink(title = new_title, recipe = new_recipe)
+        print(drink)
         drink.insert()
         return jsonify({"success": True,
                         "drinks": drink.long()
@@ -96,7 +117,6 @@ def create_drinks():
     except Exception as e:
         print(e)
         abort(422)
-
 
 '''
 @TODO implement endpoint
