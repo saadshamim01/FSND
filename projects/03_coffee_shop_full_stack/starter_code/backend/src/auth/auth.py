@@ -5,9 +5,9 @@ from jose import jwt
 from urllib.request import urlopen
 
 
-AUTH0_DOMAIN = 'udacity-fsnd.auth0.com'
+AUTH0_DOMAIN = 'fsnd1998.us.auth0.com'
 ALGORITHMS = ['RS256']
-API_AUDIENCE = 'dev'
+API_AUDIENCE = 'coffee'
 
 ## AuthError Exception
 '''
@@ -76,6 +76,14 @@ def get_token_auth_header():
 '''
 def check_permissions(permission, payload):
     raise Exception('Not Implemented')
+
+#@app.route('/drinks, methods=['POST')
+#           @requires_auth()
+#           def post_drinks(user):
+#            if('post:drinks' in user.permissions):
+#                return Drink('cola')
+#            else:
+#                abort(403)
 
 '''
 @TODO implement verify_decode_jwt(token) method
