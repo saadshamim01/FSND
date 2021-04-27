@@ -34,7 +34,7 @@ Example
 
 Find out more
 3
-'''
+```
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -56,8 +56,7 @@ Find out more
   There is a simple reason why Web Developer is such a hot job right now. Put simply, what Web Developers do is create how we experience … the web. If you proceed from the notion that every person who engages with the web would prefer a great experience, then you can say that everyone who engages with the web would prefer that a Web Developer have done a great job. Companies of course know this, so they hire Web Developers to ensure their sites provide great experiences. So, lots of websites and lots of users means lots of demand. LOTS of demand. 🔥
 </body>
 </html>
-'''
-
+```
 
 
 
