@@ -32,6 +32,7 @@ migrate = Migrate(app, db)
 # Models.
 #----------------------------------------------------------------------------#
 
+#Setting up the show Database
 class Show(db.Model):
   __tablename__ = 'Show'
   id = db.Column(db.Integer, primary_key=True)
@@ -44,7 +45,7 @@ class Show(db.Model):
   def __repr__(self):
     return f'<Show Id: {self.id} Venue_ID: {self.venue_id}, Artist_ID: {self.artist_id}>'
 
-
+#Setting up the Venue Database
 class Venue(db.Model):
     __tablename__ = 'Venue'
 
@@ -72,9 +73,9 @@ class Venue(db.Model):
                 }
 
     def __repr__(self):
-      return f'<Artist {self.id} {self.name} {self.city} {self.state} {self.address}>'
+      return f'<Artist {self.id} {self.name} {self.city} {self.state} {self.address} {self.phone} {self.genres} {self.facebook_link} {self.image_link} {self.website_link} {self.seeking_talent} {self.seeking_description}>'
 
-
+#Setting up the Artist Database
 class Artist(db.Model):
     __tablename__ = 'Artist'
 
@@ -92,7 +93,8 @@ class Artist(db.Model):
     shows = db.relationship('Show', backref='Artist', lazy=True, cascade='all, delete-orphan')
 
     def __repr__(self):
-      return f'<Venue {self.id} {self.name} {self.city} {self.state} >'
+      return f'<Venue {self.id} {self.name} {self.city} {self.state} {self.phone} {self.genres} {self.image_link} {self.facebook_link} {self.facebook_link} {self.seeking_venue} {self.seeking_description}>'
+
 
 
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
@@ -123,26 +125,6 @@ def index():
 #  Venues
 #  ----------------------------------------------------------------
 
-#@app.route('/venues')
-#def venues():
-#  try:
-#    distinct_state_city = Venue.query.distinct(Venue.city, Venue.state).all()
-#    data = []
-#    for state_city in distinct_state_city:
-#        venues = Venue.query.filter(Venue.state == state_city.state, Venue.city == state_city.city).all()
-#        venues_data_with_num_upcoming_shows = []
-#        for venue in venues:
-#            venues_data_with_num_upcoming_shows.append(
-#                venue.serialize_with_num_upcoming_shows)
-#        data.append({
-#            'state': state_city.state,
-#            'city': state_city.city,
-#            'venues': venues_data_with_num_upcoming_shows
-#        })
-#    return render_template('pages/venues.html', areas=data)
-#  except:
-#    flash('Something went wrong please try again later, see you soon!')
-#    return render_template("pages/home.html")
 
 @app.route('/venues')
 def venues():
