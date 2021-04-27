@@ -13,7 +13,8 @@ pip install -r requirements.txt
 
 After installing the dependencies you can start working on the project.
 
-ds
+
+
 
 
 Navigate to the folder containing the file. Using

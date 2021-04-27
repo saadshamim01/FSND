@@ -17,7 +17,7 @@ CORS(app)
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 !! Running this funciton will add one
 '''
-#db_drop_and_create_all()
+db_drop_and_create_all()
 
 # ROUTES
 '''
@@ -29,10 +29,10 @@ CORS(app)
         or appropriate status code indicating reason for failure
 '''
 
-@app.route('/')
-#@requires_auth('post:drinks')
-def hello():
-    return 'hello'
+#@app.route('/')
+##@requires_auth('post:drinks')
+#def hello():
+#    return 'hello'
 
 @app.route('/drinks')
 def get_drinks():
@@ -57,7 +57,8 @@ def get_drinks():
 '''
 
 @app.route('/drinks-detail')
-def get_drinks_detail():
+@requires_auth('get:drinks-detail')
+def get_drinks_detail(payload):
     drinks = Drink.query.order_by('id').all()
     drink = [drink.long() for drink in drinks]
 
@@ -80,7 +81,8 @@ def get_drinks_detail():
 '''
 
 @app.route("/drinks", methods=['POST'])
-def create_drinks():
+@requires_auth("post:drinks")
+def create_drinks(payload):
     code='utf-8'
     try:
         if dict(request.form or request.json or request.data):
@@ -111,7 +113,8 @@ def create_drinks():
 '''
 
 @app.route('/drinks/<int:id>', methods=['PATCH'])
-def update_drink(id):
+@requires_auth("patch:drinks")
+def update_drink(payload, id):
     body = request.get_json()
     new_title = body.get('title', None)
     new_recipe = body.get('recipe', None)
@@ -127,7 +130,7 @@ def update_drink(id):
         drink.update()
         return jsonify({
                        'success': True,
-                       'drinks': drink.long()
+                       'drinks': [drink.long()]
                        }), 200
     except Exception as e:
         print(e)
@@ -145,8 +148,9 @@ def update_drink(id):
 '''
 
 @app.route('/drinks/<int:id>', methods = ['DELETE'])
+@requires_auth("delete:drinks")
 #@requires_auth('delete:drinks')
-def delete_drink(id):
+def delete_drink(payload, id):
     try:
         drink = Drink.query.filter(Drink.id == id).one_or_none()
 

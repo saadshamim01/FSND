@@ -30,36 +30,52 @@ class AuthError(Exception):
         it should raise an AuthError if the header is malformed
     return the token part of the header
 '''
+
+#def get_token_auth_header():
+#    """Obtains the Access Token from the Authorization Header
+#    """
+#    auth = request.headers.get('Authorization', None)
+#    if not auth:
+#        raise AuthError({
+#            'code': 'authorization_header_missing',
+#            'description': 'Authorization header is expected.'
+#        }, 401)
+#
+#    parts = auth.split()
+#    if parts[0].lower() != 'bearer':
+#        raise AuthError({
+#            'code': 'invalid_header',
+#            'description': 'Authorization header must start with "Bearer".'
+#        }, 401)
+#
+#    elif len(parts) == 1:
+#        raise AuthError({
+#            'code': 'invalid_header',
+#            'description': 'Token not found.'
+#        }, 401)
+#
+#    elif len(parts) > 2:
+#        raise AuthError({
+#            'code': 'invalid_header',
+#            'description': 'Authorization header must be bearer token.'
+#        }, 401)
+#
+#    token = parts[1]
+#    return token
+
 def get_token_auth_header():
+    if "Authorization" in request.headers:
+        auth_header = request.headers["Authorization"]
+        if auth_header:
+            bearer_token_array = auth_header.split(' ')
+            if bearer_token_array[0] and bearer_token_array[0].lower() == "bearer" and bearer_token_array[1]:
+                return bearer_token_array[1]
+    raise AuthError({
+        'success': False,
+        'message': 'JWT not found',
+        'error': 401
+    }, 401)
 
-    auth = request.headers.get('Authorization', None)
-    if not auth:
-        raise AuthError({
-                        'code': 'authorization_header_missing',
-                        'description': 'Authorization header is expected'
-                        }, 401)
-
-    parts = auth.split()
-    if parts[0].lower() != 'bearer':
-        raise AuthError({
-                        'code': 'invalid_header',
-                        'description': 'Authorization header must start with "Bearer".'
-                        }, 401)
-
-    elif len(parts) == 1:
-        raise AuthError({
-                        'code': 'invalid_header',
-                        'description': 'Token not found.'
-                        }, 401)
-
-    elif len(parts) > 2:
-        raise AuthError({
-                        'code': 'invalid_header',
-                        'description': 'Authorization header must be bearer token.'
-                        }, 401)
-
-    token = parts[1]
-    return token
 
    #raise Exception('Not Implemented')
 
@@ -74,16 +90,16 @@ def get_token_auth_header():
     it should raise an AuthError if the requested permission string is not in the payload permissions array
     return true otherwise
 '''
-def check_permissions(permission, payload):
-    raise Exception('Not Implemented')
 
-#@app.route('/drinks, methods=['POST')
-#           @requires_auth()
-#           def post_drinks(user):
-#            if('post:drinks' in user.permissions):
-#                return Drink('cola')
-#            else:
-#                abort(403)
+def check_permissions(permission, payload):
+    if "permissions" in payload:
+        if permission in payload['permissions']:
+            return True
+    raise AuthError({
+                    'success':False,
+                    'message':'Permission not found in JWT',
+                    'error':401
+                    }, 401)
 
 '''
 @TODO implement verify_decode_jwt(token) method
@@ -98,6 +114,7 @@ def check_permissions(permission, payload):
 
     !!NOTE urlopen has a common certificate error described here: https://stackoverflow.com/questions/50236117/scraping-ssl-certificate-verify-failed-error-for-http-en-wikipedia-org
 '''
+
 def verify_decode_jwt(token):
     jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
     jwks = json.loads(jsonurl.read())
@@ -105,11 +122,51 @@ def verify_decode_jwt(token):
     rsa_key = {}
     if 'kid' not in unverified_header:
         raise AuthError({
-                        'code': 'invalid_header',
-                        'description': 'Authorization malformed.'
-                        }, 401)
-    #raise Exception('Not Implemented')
+            'code': 'invalid_header',
+            'description': 'Authorization malformed.'
+        }, 401)
 
+    for key in jwks['keys']:
+        if key['kid'] == unverified_header['kid']:
+            rsa_key = {
+                'kty': key['kty'],
+                'kid': key['kid'],
+                'use': key['use'],
+                'n': key['n'],
+                'e': key['e']
+            }
+    if rsa_key:
+        try:
+            payload = jwt.decode(
+                token,
+                rsa_key,
+                algorithms=ALGORITHMS,
+                audience=API_AUDIENCE,
+                issuer='https://' + AUTH0_DOMAIN + '/'
+            )
+
+            return payload
+
+        except jwt.ExpiredSignatureError:
+            raise AuthError({
+                'code': 'token_expired',
+                'description': 'Token expired.'
+            }, 401)
+
+        except jwt.JWTClaimsError:
+            raise AuthError({
+                'code': 'invalid_claims',
+                'description': 'Incorrect claims. Please, check the audience and issuer.'
+            }, 401)
+        except Exception:
+            raise AuthError({
+                'code': 'invalid_header',
+                'description': 'Unable to parse authentication token.'
+            }, 400)
+    raise AuthError({
+                'code': 'invalid_header',
+                'description': 'Unable to find the appropriate key.'
+            }, 400)
 
 
 '''
@@ -122,6 +179,27 @@ def verify_decode_jwt(token):
     it should use the check_permissions method validate claims and check the requested permission
     return the decorator which passes the decoded payload to the decorated method
 '''
+
+#def requires_auth(f):
+#    @wraps(f)
+#    def wrapper(*args, **kwargs):
+#        token = get_token_auth_header()
+#        try:
+#            payload = verify_decode_jwt(token)
+#        except:
+#            abort(401)
+#        return f(payload, *args, **kwargs)
+#
+#    return wrapper
+#
+#@app.route('/headers')
+#@requires_auth
+#def headers(payload):
+#    print(payload)
+#    return 'Access Granted'
+
+
+
 def requires_auth(permission=''):
     def requires_auth_decorator(f):
         @wraps(f)
