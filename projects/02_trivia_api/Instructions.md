@@ -1,4 +1,4 @@
-#Udacity Trivia
+# Udacity Trivia API Backend
 
 Trivia is a website for taking quiz in categories. To use and to add more features to the website. You can setup the website by following the setup instructions.
 
@@ -412,6 +412,7 @@ When the APIs failed to do what they design to do, we get errors. Errors are ret
 ```
 
 - 500: Internal Server Error
+```
   @app.errorhandler(500)
   def internal_server_error(error):
     return jsonify({
@@ -419,6 +420,7 @@ When the APIs failed to do what they design to do, we get errors. Errors are ret
                  "error": 405,
                  "message": "internal server error."
                    }), 405
+```
 
 ## Testing
 To run the tests, run the following codes:
