@@ -137,7 +137,7 @@ def create_app(test_config=None):
     except:
       abort(422)
 
-#                   curl -X DELETE http://127.0.0.1:5000/questions/12
+#                   curl -X DELETE http://127.0.0.1:5000/questions/1
 
 
   '''
@@ -320,6 +320,15 @@ def create_app(test_config=None):
                  "error": 405,
                  "message": "method not allowed"
                    }), 405
+
+  @app.errorhandler(500)
+  def internal_server_error(error):
+    return jsonify({
+                 "success": False,
+                 "error": 500,
+                 "message": "internal server error."
+                   }), 500
+
 
   return app
 
