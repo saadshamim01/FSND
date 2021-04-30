@@ -17,49 +17,12 @@ def setup_db(app, database_path=database_path):
     db.create_all()
 
 
-
-'''
-class Question(db.Model):
-  __tablename__ = 'questions'
-
-  id = Column(Integer, primary_key=True)
-  question = Column(String)
-  answer = Column(String)
-  category = Column(String)
-  difficulty = Column(Integer)
-
-  def __init__(self, question, answer, category, difficulty):
-    self.question = question
-    self.answer = answer
-    self.category = category
-    self.difficulty = difficulty
-
-  def insert(self):
-    db.session.add(self)
-    db.session.commit()
-
-  def update(self):
-    db.session.commit()
-
-  def delete(self):
-    db.session.delete(self)
-    db.session.commit()
-
-  def format(self):
-    return {
-      'id': self.id,
-      'question': self.question,
-      'answer': self.answer,
-      'category': self.category,
-      'difficulty': self.difficulty
-    }
-'''
 class Actors(db.Model):
     __tablename__ = 'actors'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    age = db.Column(db.Integer)
-    gender = db.Column(String)
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    age = Column(Integer)
+    gender = Column(String)
 
     def __init__(self, name, age, gender):
         self.name = name
@@ -85,8 +48,8 @@ class Actors(db.Model):
         'gender': self.gender
         }
 
-    def __repr__(self):
-        return f'<Actors ID: {self.id} Name: {self.name} Age: {self.age} Gender: {self.gender}>'
+#    def __repr__(self):
+#        return f'<Actors ID: {self.id} Name: {self.name} Age: {self.age} Gender: {self.gender}>'
 
 class Movies(db.Model):
     __tablename__ = 'movies'

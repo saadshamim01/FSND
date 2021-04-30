@@ -1,9 +1,13 @@
+import os
 import json
 from flask import request, _request_ctx_stack
 from functools import wraps
 from jose import jwt
 from urllib.request import urlopen
 
+#AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN')
+#ALGORITHMS = os.getenv('ALGORITHMS')
+#API_AUDIENCE = os.getenv('API_AUDIENCE')
 
 AUTH0_DOMAIN = 'fsnd1998.us.auth0.com'
 ALGORITHMS = ['RS256']
@@ -31,37 +35,6 @@ class AuthError(Exception):
     return the token part of the header
 '''
 
-#def get_token_auth_header():
-#    """Obtains the Access Token from the Authorization Header
-#    """
-#    auth = request.headers.get('Authorization', None)
-#    if not auth:
-#        raise AuthError({
-#            'code': 'authorization_header_missing',
-#            'description': 'Authorization header is expected.'
-#        }, 401)
-#
-#    parts = auth.split()
-#    if parts[0].lower() != 'bearer':
-#        raise AuthError({
-#            'code': 'invalid_header',
-#            'description': 'Authorization header must start with "Bearer".'
-#        }, 401)
-#
-#    elif len(parts) == 1:
-#        raise AuthError({
-#            'code': 'invalid_header',
-#            'description': 'Token not found.'
-#        }, 401)
-#
-#    elif len(parts) > 2:
-#        raise AuthError({
-#            'code': 'invalid_header',
-#            'description': 'Authorization header must be bearer token.'
-#        }, 401)
-#
-#    token = parts[1]
-#    return token
 
 def get_token_auth_header():
     if "Authorization" in request.headers:
@@ -97,9 +70,9 @@ def check_permissions(permission, payload):
             return True
     raise AuthError({
                     'success':False,
-                    'message':'Permission not found in JWT',
-                    'error':401
-                    }, 401)
+                    'message':'Permission not found.',
+                    'error':403
+                    }, 403)
 
 '''
 @TODO implement verify_decode_jwt(token) method
@@ -179,25 +152,6 @@ def verify_decode_jwt(token):
     it should use the check_permissions method validate claims and check the requested permission
     return the decorator which passes the decoded payload to the decorated method
 '''
-
-#def requires_auth(f):
-#    @wraps(f)
-#    def wrapper(*args, **kwargs):
-#        token = get_token_auth_header()
-#        try:
-#            payload = verify_decode_jwt(token)
-#        except:
-#            abort(401)
-#        return f(payload, *args, **kwargs)
-#
-#    return wrapper
-#
-#@app.route('/headers')
-#@requires_auth
-#def headers(payload):
-#    print(payload)
-#    return 'Access Granted'
-
 
 
 def requires_auth(permission=''):

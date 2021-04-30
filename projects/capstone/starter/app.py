@@ -1,6 +1,7 @@
 import os
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import exc
 from flask_cors import CORS
 
 from flask_migrate import Migrate
@@ -14,8 +15,8 @@ from datetime import datetime
 def create_app(test_config=None):
     app = Flask(__name__)
     setup_db(app)
-    #db = SQLAlchemy(app)
-    #migrate = Migrate(app, db)
+    db = SQLAlchemy(app)
+    migrate = Migrate(app, db)
     #CORS(app)
 
 
@@ -89,12 +90,13 @@ def create_app(test_config=None):
         new_gender = body.get('gender', None)
 
         try:
-            new_actor = Actors(name=new_name, age=new_age, gender=new_gender)
-            Actors.insert(new_actor)
+          actor = Actors(name=new_name, age=new_age, gender=new_gender)
 
-            return jsonify({
+          print(actor.name)
+          actor.insert()
+          return jsonify({
                            'success': True,
-                           'created': 'ss'
+                           'created': actor
                            }), 200
         except:
             abort(422)
@@ -102,7 +104,7 @@ def create_app(test_config=None):
 #curl -X POST -H "Content-Type: application/json" -d '{"name":"saad","age":23,"gender":"Male"}' http://127.0.0.1:5000/actors
 #curl -X POST -H "Content-Type: application/json" -d '{"name":"saad","age":23,"gender":"Male"}' http://127.0.0.1:5000/actors/add
 
-    @app.route('/actors/<actor_id>')
+    @app.route('/actors/<int:actor_id>', methods=['PATCH'])
     def edit_actor(actor_id):
         body = request.get_json()
         new_name = body.get('name', None)
@@ -122,7 +124,7 @@ def create_app(test_config=None):
             return jsonify({
                            'success': True,
                            'actor': actor
-                           })
+                           }), 200
 
         except Exception as e:
             print(e)
@@ -130,39 +132,45 @@ def create_app(test_config=None):
 
 #curl http://127.0.0.1:5000/actors/2 -X PATCH -H "Content-Type: application/json" -d '{"name":"Saasdd"}'
 
+    @app.errorhandler(404)
+    def not_found(error):
+      return jsonify({
+                     "success": False,
+                     "error": 404,
+                     "message": "resource not found"
+                     }), 404
 
+    @app.errorhandler(422)
+    def unprocessable(error):
+      return jsonify({
+                     "success": False,
+                     "error": 422,
+                     "message": "unprocessable"
+                     }), 422
 
-#@app.route('/drinks/<int:id>', methods=['PATCH'])
-#@requires_auth("patch:drinks")
-#def update_drink(payload, id):
-#    body = request.get_json()
-#    new_title = body.get('title', None)
-#    new_recipe = body.get('recipe', None)
-#
-#    drink = Drink.query.filter(Drink.id == id).one_or_none()
-#
-#    if drink is None:
-#        abort(404)
-#
-#    try:
-#        drink.title = new_title
-#        drink.recipe = json.dumps(new_recipe)
-#        drink.update()
-#        return jsonify({
-#                       'success': True,
-#                       'drinks': [drink.long()]
-#                       }), 200
-#    except Exception as e:
-#        print(e)
-#        abort(422)
+    @app.errorhandler(400)
+    def bad_request(error):
+      return jsonify({
+                     "success": False,
+                     "error": 400,
+                     "message": "bad request"
+                     }), 400
 
+    @app.errorhandler(405)
+    def method_not_allowed(error):
+      return jsonify({
+                   "success": False,
+                   "error": 405,
+                   "message": "method not allowed"
+                     }), 405
 
-
-
-#    Two GET requests
-#One POST request
-#One PATCH request
-#One DELETE request
+    @app.errorhandler(500)
+    def internal_server_error(error):
+      return jsonify({
+                   "success": False,
+                   "error": 500,
+                   "message": "internal server error."
+                     }), 500
 
     return app
 
@@ -173,48 +181,3 @@ def create_app(test_config=None):
 
 
 
-## Imports
-##----------------------------------------------------------------------------#
-#import sys
-#import json
-#import dateutil.parser
-#import babel
-#from flask import Flask, render_template, request, Response, flash, redirect, url_for
-#from flask_moment import Moment
-#from flask_sqlalchemy import SQLAlchemy
-#import logging
-#from logging import Formatter, FileHandler
-#from flask_wtf import Form
-#from flask_migrate import Migrate
-#from alembic import op
-#from forms import *
-#from flask import abort
-#from datetime import datetime
-##----------------------------------------------------------------------------#
-## App Config.
-##----------------------------------------------------------------------------#
-#
-#app = Flask(__name__)
-#moment = Moment(app)
-#app.config.from_object('config')
-#db = SQLAlchemy(app)
-#migrate = Migrate(app, db)
-#
-## TODO: connect to a local postgresql database
-#
-##----------------------------------------------------------------------------#
-## Models.
-##----------------------------------------------------------------------------#
-#
-##Setting up the show Database
-#class Show(db.Model):
-#  __tablename__ = 'Show'
-#  id = db.Column(db.Integer, primary_key=True)
-#  venue_id = db.Column(db.Integer, db.ForeignKey(
-#        'Venue.id'), nullable=False)
-#  artist_id = db.Column(db.Integer, db.ForeignKey(
-#        'Artist.id'), nullable=False)
-#  start_time = db.Column(db.DateTime, nullable=False)
-#
-#  def __repr__(self):
-#    return f'<Show Id: {self.id} Venue_ID: {self.venue_id}, Artist_ID: {self.artist_id}>'
