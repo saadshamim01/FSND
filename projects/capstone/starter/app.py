@@ -9,6 +9,7 @@ from flask import abort
 import random
 
 from models import setup_db, Actor, Movie
+from auth import requires_auth, AuthError
 
 from datetime import datetime
 
@@ -31,7 +32,8 @@ def create_app(test_config=None):
 ####################### Two get requests
 
     @app.route('/actors')
-    def get_actors():
+    @requires_auth('get:actors')
+    def get_actors(payload):
         actors = Actor.query.order_by('id').all()
         actor = [actor.format() for actor in actors]
 
@@ -44,6 +46,8 @@ def create_app(test_config=None):
                            }), 200
 
         #curl -X GET http://127.0.0.1:5000/actors
+        #curl --request GET --url http://127.0.0.1:5000/actors
+
 
     @app.route('/movies')
     def get_movies():
@@ -180,8 +184,8 @@ def create_app(test_config=None):
                            }), 200
 
         except Exception as e:
-            print(e)
-            abort(422)
+          print(e)
+          abort(422)
 
 #curl http://127.0.0.1:5000/actors/2 -X PATCH -H "Content-Type: application/json" -d '{"name":"ruby", "age": "21", "gender": "Female"}'
 
@@ -226,6 +230,12 @@ def create_app(test_config=None):
                    "error": 500,
                    "message": "internal server error."
                      }), 500
+
+    @app.errorhandler(AuthError)
+    def handle_auth_error(e):
+      response = jsonify(e.error)
+      response.status_code = e.status_code
+      return response
 
     return app
 
