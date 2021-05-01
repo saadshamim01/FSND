@@ -1,8 +1,9 @@
 import os
-import json
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, String, Integer, create_engine
+from flask_sqlalchemy import SQLAlchemy
+import json
 from datetime import datetime
+
 
 database_name = "capstone"
 database_path = "postgres://{}:{}@{}/{}".format('saadshamim', 'hello', 'localhost:5432', database_name)
@@ -15,14 +16,15 @@ def setup_db(app, database_path=database_path):
     db.app = app
     db.init_app(app)
     db.create_all()
+    #migrate = Migrate(app,db)
 
 
-class Actors(db.Model):
-    __tablename__ = 'actors'
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    age = Column(Integer)
-    gender = Column(String)
+class Actor(db.Model):
+    __tablename__ = 'Actor'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    age = db.Column(db.Integer)
+    gender = db.Column(db.String)
 
     def __init__(self, name, age, gender):
         self.name = name
@@ -30,11 +32,11 @@ class Actors(db.Model):
         self.gender = gender
 
     def insert(self):
-        self.session.add(self)
-        self.session.commit()
+        db.session.add(self)
+        db.session.commit()
 
     def update(self):
-        self.session.commit()
+        db.session.commit()
 
     def delete(self):
         db.session.delete(self)
@@ -51,8 +53,8 @@ class Actors(db.Model):
 #    def __repr__(self):
 #        return f'<Actors ID: {self.id} Name: {self.name} Age: {self.age} Gender: {self.gender}>'
 
-class Movies(db.Model):
-    __tablename__ = 'movies'
+class Movie(db.Model):
+    __tablename__ = 'Movie'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(120))
     release_date = db.Column(db.DateTime)
@@ -62,15 +64,15 @@ class Movies(db.Model):
         self.release_date
 
     def insert(self):
-        self.session.add(self)
-        self.session.commit()
+        db.session.add(self)
+        db.session.commit()
 
     def update(self):
-        self.session.commit()
+        db.session.commit()
 
     def delete(self):
-        self.session.delete(self)
-        self.session.commit()
+        db.session.delete(self)
+        db.session.commit()
 
     def format(self):
         return{
@@ -78,8 +80,8 @@ class Movies(db.Model):
         'release_date': self.release_date
         }
 
-    def __repr__(self):
-        return f'<Movies ID: {self.id} Title: {self.title} release_date: {self.release_date}>'
+#    def __repr__(self):
+#        return f'<Movies ID: {self.id} Title: {self.title} release_date: {self.release_date}>'
 
 
 
