@@ -32,8 +32,8 @@ def create_app(test_config=None):
 ####################### Two get requests
 
     @app.route('/actors')
-    @requires_auth('get:actors')
-    def get_actors(payload):
+    #@requires_auth('get:actors')
+    def get_actors():
         actors = Actor.query.order_by('id').all()
         actor = [actor.format() for actor in actors]
 
@@ -189,11 +189,35 @@ def create_app(test_config=None):
 
 #curl http://127.0.0.1:5000/actors/2 -X PATCH -H "Content-Type: application/json" -d '{"name":"ruby", "age": "21", "gender": "Female"}'
 
+    @app.route('/movies/<int:movie_id>', methods=['PATCH'])
+    def edit_movie(movie_id):
+        body = request.get_json()
+        new_title = body.get('title', None)
+        new_release_date = body.get('release_date', None)
+
+        movie = Movie.query.filter(Movie.id == movie_id).one_or_none()
+
+        if movie is None:
+            abort(404)
+
+        try:
+            movie.title = new_title
+            movie.release_date = new_release_date
+            movie.update()
+            return jsonify({
+                           'success': True,
+                           'edit': movie.format()
+                           }), 200
+        except Exception as e:
+            print (e)
+            abort(422)
+
+#curl http://127.0.0.1:5000/actors/2 -X PATCH -H "Content-Type: application/json" -d '{"title":"Age of Ultron"}'
 
 
     @app.errorhandler(404)
     def not_found(error):
-      return jsonify({
+        return jsonify({
                      "success": False,
                      "error": 404,
                      "message": "resource not found"

@@ -83,7 +83,7 @@ class CapstoneTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(data['create'])
 
-###TEST FOR FAILED 405 POST ACTOR & MOVIE
+####TEST FOR FAILED 405 POST ACTOR & MOVIE
 
     def test_405_if_actor_creation_not_allowed(self):
         res = self.client().post('actors/2', json=self.new_actor)
@@ -117,17 +117,17 @@ class CapstoneTestCase(unittest.TestCase):
         res = self.client().patch('/movies/2', json={'title':'Age of Ultron'})
         data = json.loads(res.data)
 
-        movie = Movie.query.filter(Movie.id ==2).one_or_none()
+        movie = Movie.query.filter(Movie.id == 2).one_or_none()
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertTrue(data['edit'])
 
 
-####TEST FOR FAILED ACTOR & MOVIE UPDATE
+###TEST FOR FAILED ACTOR & MOVIE UPDATE
 
     def test_400_for_failed_actor_update(self):
-        res = self.client().patch('/actors/6')
+        res = self.client().patch('/actors/2')
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 400)
@@ -164,23 +164,23 @@ class CapstoneTestCase(unittest.TestCase):
 #        self.assertEqual(data['success'], True)
 #        self.assertTrue(data['delete'])
 
-####FAILED DELETE TEST FOR ACTOR & MOVIE
+###FAILED DELETE TEST FOR ACTOR & MOVIE
 
-    def test_404_if_actor_does_not_exist(self):
+    def test_422_if_actor_does_not_exist(self):
         res = self.client().delete('/actors/1000')
         data = json.loads(res.data)
 
-        self.assertEqual(res.status_code, 404)
+        self.assertEqual(res.status_code, 422)
         self.assertEqual(data['success'], False)
-        self.assertEqual(data['message'],'resource not found' )
+        self.assertEqual(data['message'],'unprocessable' )
 
-    def test_404_if_movie_does_not_exit(self):
+    def test_422_if_movie_does_not_exit(self):
         res = self.client().delete('/movies/1000')
         data = json.loads(res.data)
 
-        self.assertEqual(res.status_code, 404)
+        self.assertEqual(res.status_code, 422)
         self.assertEqual(data['success'], False)
-        self.assertEqual(data['message'], 'resource not found')
+        self.assertEqual(data['message'], 'unprocessable')
 
 
 
