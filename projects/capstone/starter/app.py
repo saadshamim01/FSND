@@ -25,7 +25,7 @@ def create_app(test_config=None):
         return jsonify({
                        "success": True,
                        "message": "Hello world"
-                       })
+                       }), 200
 
 
 ####################### Two get requests
@@ -65,7 +65,7 @@ def create_app(test_config=None):
     @app.route('/actors/<actor_id>', methods=['DELETE'])
     def delete_actor(actor_id):
         try:
-            actor = Actor.query.filter(Actors.id == actor_id).one_or_none()
+            actor = Actor.query.filter(Actor.id == actor_id).one_or_none()
 
             if actor is None:
                 print(sys.exc_info())
@@ -74,10 +74,13 @@ def create_app(test_config=None):
             actor.delete()
             return jsonify({
                            'success': True,
-                           'delete': actor_id
+                           'delete': actor.format()
+
                            }), 200
-        except:
-            abort(422)
+
+        except Exception as e:
+          print(e)
+          abort(422)
 
             #curl -X DELETE http://127.0.0.1:5000/actors/1
 
@@ -93,10 +96,12 @@ def create_app(test_config=None):
         movie.delete()
         return jsonify({
                        'success': True,
-                       'delete': movie_id
+                       'delete': movie.format()
                        })
       except:
         abort(422)
+
+        #curl -X DELETE http://127.0.0.1:5000/movies/1
 
 ########################## 2 post requests
 
@@ -117,7 +122,9 @@ def create_app(test_config=None):
           print(actor.name)
           actor.insert()
           return jsonify({
-                           'success': True
+                           'success': True,
+                           'create': actor.id
+
                            }), 200
         except Exception as e:
           print(e)
@@ -140,7 +147,8 @@ def create_app(test_config=None):
         movie = Movie(title=new_title,release_date=new_release_date)
         movie.insert()
         return jsonify({
-                       'success': True
+                       'success': True,
+                       'create': movie.id
                        })
 
       except Exception as e:
@@ -168,42 +176,16 @@ def create_app(test_config=None):
             actor.update()
             return jsonify({
                            'success': True,
-                           'actor': actor
+                           'edit': actor.format()
                            }), 200
 
         except Exception as e:
             print(e)
             abort(422)
 
-@app.route('/drinks/<int:id>', methods=['PATCH'])
-@requires_auth("patch:drinks")
-def update_drink(payload, id):
-    body = request.get_json()
-    new_title = body.get('title', None)
-    new_recipe = body.get('recipe', None)
-
-    drink = Drink.query.filter(Drink.id == id).one_or_none()
-
-    if drink is None:
-        abort(404)
-
-    try:
-        drink.title = new_title
-        drink.recipe = json.dumps(new_recipe)
-        drink.update()
-        return jsonify({
-                       'success': True,
-                       'drinks': [drink.long()]
-                       }), 200
-    except Exception as e:
-        print(e)
-        abort(422)
-    @app.route('/movies<int:movie_id>', methods=['PATCH'])
-    def edit_movie(movie_id):
-      body = request.get_json()
-      new_title = body.get('name')
-
 #curl http://127.0.0.1:5000/actors/2 -X PATCH -H "Content-Type: application/json" -d '{"name":"ruby", "age": "21", "gender": "Female"}'
+
+
 
     @app.errorhandler(404)
     def not_found(error):

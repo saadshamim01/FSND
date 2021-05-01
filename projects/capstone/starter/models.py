@@ -76,6 +76,7 @@ class Movie(db.Model):
 
     def format(self):
         return{
+        'id': self.id,
         'title': self.title,
         'release_date': self.release_date
         }
