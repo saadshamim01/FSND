@@ -55,7 +55,6 @@ POST '/questions/search'
 
 ```
 
-
 #### GET 'questions'
 - Fetches a list of questions with their id, question, answer, category and difficulty.
 - Request Arguments: None

@@ -50,6 +50,7 @@ def create_app(test_config=None):
 
 
     @app.route('/movies')
+    #@requires_auth('get:movies')
     def get_movies():
         movies = Movie.query.order_by('id').all()
         movie = [movie.format() for movie in movies]
@@ -127,7 +128,7 @@ def create_app(test_config=None):
           actor.insert()
           return jsonify({
                            'success': True,
-                           'create': actor.id
+                           'create': actor.format()
 
                            }), 200
         except Exception as e:
@@ -152,7 +153,7 @@ def create_app(test_config=None):
         movie.insert()
         return jsonify({
                        'success': True,
-                       'create': movie.id
+                       'create': movie.format()
                        })
 
       except Exception as e:
@@ -187,7 +188,7 @@ def create_app(test_config=None):
           print(e)
           abort(422)
 
-#curl http://127.0.0.1:5000/actors/2 -X PATCH -H "Content-Type: application/json" -d '{"name":"ruby", "age": "21", "gender": "Female"}'
+#curl http://127.0.0.1:5000/actors/4 -X PATCH -H "Content-Type: application/json" -d '{"name":"ruby", "age": "21", "gender": "Female"}'
 
     @app.route('/movies/<int:movie_id>', methods=['PATCH'])
     def edit_movie(movie_id):
@@ -212,7 +213,7 @@ def create_app(test_config=None):
             print (e)
             abort(422)
 
-#curl http://127.0.0.1:5000/actors/2 -X PATCH -H "Content-Type: application/json" -d '{"title":"Age of Ultron"}'
+#curl http://127.0.0.1:5000/movies/10 -X PATCH -H "Content-Type: application/json" -d '{"title":"Age of Ultron"}'
 
 
     @app.errorhandler(404)
