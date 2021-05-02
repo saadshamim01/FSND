@@ -168,25 +168,28 @@ Executive Producer
 
 ## Authentication
 
-### Casting Assistant
+###3 Casting Assistant
 
 - Can GET actors and movies list only
 
 Username: saad_basic@udacity.com
+
 Password: Ironman@321
 
-### Casting Director
+#### Casting Director
 
 - Can GET, POST, PATCH actors and movies list
 
 Username: saad_intermediate@udacity.com
+
 Password: Ironman@321
 
-### Executive Producer
+#### Executive Producer
 
 - Can GET, POST, PATCH and DELETE actors & movies list
 
 Username: saad_advance@udacity.com
+
 Password: Ironman@321
 
 
