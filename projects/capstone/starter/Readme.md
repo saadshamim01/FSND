@@ -168,7 +168,7 @@ Executive Producer
 
 ## Authentication
 
-###3 Casting Assistant
+#### Casting Assistant
 
 - Can GET actors and movies list only
 
@@ -191,10 +191,6 @@ Password: Ironman@321
 Username: saad_advance@udacity.com
 
 Password: Ironman@321
-
-
-
-
 
 
 

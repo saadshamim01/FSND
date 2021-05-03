@@ -6,8 +6,11 @@ from datetime import datetime
 
 
 database_name = "capstone"
-database_path = "postgres://{}:{}@{}/{}".format('saadshamim', 'hello', 'localhost:5432', database_name)
+database_path = "postgres://{}@{}/{}".format('saadshamim', 'localhost:5432', database_name)
 
+"postgres://saadshamim:@localhost:5432/capstone"
+
+'postgres://saadshamim@localhost:5432/fyyur'
 db = SQLAlchemy()
 
 def setup_db(app, database_path=database_path):

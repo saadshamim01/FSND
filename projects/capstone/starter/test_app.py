@@ -7,15 +7,11 @@ from app import create_app
 from flask import request, abort
 from models import setup_db, Actor, Movie
 
+NONE = 'No_permission'
+BASIC = os.environ["CASTING_ASSISTANT"]
+INTERMEDIATE = os.environ["CASTING_DIRECTOR"]
+ADVANCE = os.environ["EXECUTIVE_PRODUCER"]
 
-#BASIC = os.environ["CASTING_ASSISTANT"]
-#INTERMEDIATE = os.environ["CASTING_DIRECTOR"]
-#ADVANCE = os.environ["EXECUTIVE_PRODUCER"]
-
-#BASIC = ('dsdd')
-BASIC = ('eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Im5pdUhhd0JjNmxoeExFV1BULVY2aiJ9.eyJpc3MiOiJodHRwczovL2ZzbmQxOTk4LnVzLmF1dGgwLmNvbS8iLCJzdWIiOiJhdXRoMHw2MDhjYmUzZThiZTIxZDAwNzAxMjU2NzAiLCJhdWQiOiJjYXBzdG9uZV9hcGkiLCJpYXQiOjE2MTk5MTU1NjIsImV4cCI6MTYxOTkyMjc2MiwiYXpwIjoiWlpSeWVpVGNmSExNbGNTQldYcGdaSnJlUzNiTmRFdmIiLCJzY29wZSI6IiIsInBlcm1pc3Npb25zIjpbImdldDphY3RvcnMiLCJnZXQ6IG1vdmllcyJdfQ.YPo637RGTBYstZDhsNGbljcUSE8KdMVSMrZZPHRHekR_TmODZ0t1HkXDBKk1iR02oAyXlrUxHAm_AhwsBIJkVpoQEPzBP3XDScxWYZc36tClZQlMoTulBHwDv2zjobFuvwyWKJ8mGrCmdV3ONyKSY0lLPfSZRg96LEY2Zs2ZSa3P3RqFT6_g2bOvfCkIwhczmWlujbFmeutSOFVX7XQRgmuBf8yNiBjT3fl8oamgu8g8AHWH1eW3c-mc5t88w7yvmRsE2fAl1FCRBHzwfCY1Kl_bXG9DO6Kyxg3LSUqrN96I0DRzjhddHOzj5iPfoNQ4q1yETU6Zi7-n85y8AILhhQ')
-INTERMEDIATE = ()
-ADVANCE = ()
 
 class CapstoneTestCase(unittest.TestCase):
     """This class represents the capstone test case"""
@@ -61,7 +57,11 @@ class CapstoneTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
 
-###TEST FOR GET ACTORS & MOVIES
+
+###################################################################
+###GET TEST FOR ACTOR & MOVIE
+###################################################################
+
 
     def test_get_actors(self):
         #res = self.client().get('/actors')
@@ -78,7 +78,31 @@ class CapstoneTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
 
-###TEST FOR POST ACTOR & MOVIE
+###TEST FOR 401 FAILED GET ACTOR & MOVIE
+
+    def test_401_get_actor_permission_not_found(self):
+        res = self.client().get('/actors')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'JWT not found')
+
+    def test_401_get_movie_permission_not_found(self):
+        res = self.client().get('/movies')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'JWT not found')
+
+###TEST FOR 403 FAILED GET ACTOR & MOVIE
+
+
+###################################################################
+###POST TEST FOR ACTOR & MOVIE
+###################################################################
+
 
     def test_create_actors(self):
         res = self.client().post('/actors',
@@ -100,7 +124,7 @@ class CapstoneTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(data['create'])
 
-####TEST FOR FAILED 405 POST ACTOR & MOVIE
+###TEST FOR 405 FAILED POST ACTOR & MOVIE
 
     def test_405_if_actor_creation_not_allowed(self):
         res = self.client().post('actors/2',
@@ -122,7 +146,46 @@ class CapstoneTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'method not allowed')
 
-###TEST FOR PATCH ACTOR & MOVIE
+###TEST FOR 401 FAILED POST ACTOR & MOVIE
+
+    def test_401_post_actor_permission_not_found(self):
+        res = self.client().post('/actors',json=self.new_actor)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'JWT not found')
+
+    def test_401_post_movie_permission_not_found(self):
+        res = self.client().post('/actors',json=self.new_movie)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'JWT not found')
+
+###TEST FOR 403 FAILED POST ACTOR & MOVIE
+
+    def test_403_post_actor_authorization_permission_not_found(self):
+        res = self.client().post('/actors', headers={'Authorization': f'Bearer {BASIC}'}, json=self.new_actor)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 403)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'Permission not found.')
+
+    def test_403_post_movie_authorization_permission_not_found(self):
+        res = self.client().post('/movies', headers={'Authorization': f'Bearer {BASIC}'}, json=self.new_movie)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 403)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'Permission not found.')
+
+###################################################################
+###PATCH TEST FOR ACTOR & MOVIE
+###################################################################
+
 
     def test_update_actor(self):
         res = self.client().patch('/actors/3',
@@ -148,8 +211,7 @@ class CapstoneTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(data['edit'])
 
-
-###TEST FOR FAILED ACTOR & MOVIE UPDATE
+###TEST FOR FAILED PATCH ACTOR & MOVIE
 
     def test_400_for_failed_actor_update(self):
         res = self.client().patch('/actors/2',
@@ -170,28 +232,68 @@ class CapstoneTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'bad request')
 
-####DELETE TEST FOR ACTOR & MOVIE
+###TEST FOR 401 FAILED PATCH ACTOR & MOVIE
 
-    def test_delete_actor(self):
-        res = self.client().delete('actors/9',
-                                   headers={'Authorization': f'Bearer {ADVANCE}'})
+    def test_401_patch_actor_permission_not_found(self):
+        res = self.client().patch('/actors/3', json={'name':'Rober Downney Jr.'})
         data = json.loads(res.data)
 
-        actor = Actor.query.filter(Actor.id == 9).one_or_none()
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'JWT not found')
 
-        self.assertEqual(res.status_code, 200)
-        self.assertEqual(data['success'], True)
-        self.assertTrue(data['delete'])
-
-    def test_delete_movie(self):
-        res = self.client().delete('movies/9',
-                                   headers={'Authorization': f'Bearer {ADVANCE}'})
+    def test_401_patch_movie_permission_not_found(self):
+        res = self.client().patch('/movies/4', json={'title':'Age of Ultron'})
         data = json.loads(res.data)
 
-        movie = Movie.query.filter(Movie.id == 9).one_or_none()
-        self.assertEqual(res.status_code, 200)
-        self.assertEqual(data['success'], True)
-        self.assertTrue(data['delete'])
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'JWT not found')
+
+###TEST FOR 403 FAILED PATCH ACTOR & MOVIE
+
+    def test_403_patch_actor_authorization_permission_not_found(self):
+        res = self.client().patch('/actors/3', headers={'Authorization': f'Bearer {BASIC}'}, json={'name':'Rober Downney Jr.'})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 403)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'Permission not found.')
+
+    def test_403_post_movie_authorization_permission_not_found(self):
+        res = self.client().patch('/movies/2', headers={'Authorization': f'Bearer {BASIC}'}, json={'title':'Age of Ultron'})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 403)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'Permission not found.')
+
+
+###################################################################
+###DELETE TEST FOR ACTOR & MOVIE
+###################################################################
+
+
+#    def test_delete_actor(self):
+#        res = self.client().delete('/actors/9',
+#                                   headers={'Authorization': f'Bearer {ADVANCE}'})
+#        data = json.loads(res.data)
+#
+#        actor = Actor.query.filter(Actor.id == 9).one_or_none()
+#
+#        self.assertEqual(res.status_code, 200)
+#        self.assertEqual(data['success'], True)
+#        self.assertTrue(data['delete'])
+#
+#    def test_delete_movie(self):
+#        res = self.client().delete('/movies/9',
+#                                   headers={'Authorization': f'Bearer {ADVANCE}'})
+#        data = json.loads(res.data)
+#
+#        movie = Movie.query.filter(Movie.id == 9).one_or_none()
+#        self.assertEqual(res.status_code, 200)
+#        self.assertEqual(data['success'], True)
+#        self.assertTrue(data['delete'])
 
 ###FAILED DELETE TEST FOR ACTOR & MOVIE
 
@@ -213,6 +315,41 @@ class CapstoneTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'unprocessable')
 
+###FAILED 401 DELETE TEST FOR ACTOR & MOVIE
+
+    def test_401_delete_actor_permission_not_found(self):
+        res = self.client().delete('actors/9')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'JWT not found')
+
+    def test_401_delete_movie_permission_not_found(self):
+        res = self.client().delete('movies/9')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'JWT not found')
+
+###FAILED 403 DELETE TEST FOR ACTOR & MOVIE
+
+    def test_403_delete_actor_authorization_permission_not_found(self):
+        res = self.client().delete('/actors/21', headers={'Authorization': f'Bearer {INTERMEDIATE}'})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 403)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'Permission not found.')
+
+    def test_403_delete_movie_authorization_permission_not_found(self):
+        res = self.client().delete('/movies/9', headers={'Authorization': f'Bearer {INTERMEDIATE}'})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 403)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'Permission not found.')
 
 
 if __name__ == "__main__":
