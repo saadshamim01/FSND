@@ -2,15 +2,15 @@ import os
 from sqlalchemy import Column, String, Integer, create_engine
 from flask_sqlalchemy import SQLAlchemy
 import json
+import psycopg2
 from datetime import datetime
 
 
-database_name = "capstone"
-database_path = "postgres://{}@{}/{}".format('saadshamim', 'localhost:5432', database_name)
+database_path = os.environ["DATABASE_URL"]
 
-"postgres://saadshamim:@localhost:5432/capstone"
 
-'postgres://saadshamim@localhost:5432/fyyur'
+#conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+
 db = SQLAlchemy()
 
 def setup_db(app, database_path=database_path):
@@ -20,7 +20,6 @@ def setup_db(app, database_path=database_path):
     db.init_app(app)
     db.create_all()
     #migrate = Migrate(app,db)
-
 
 class Actor(db.Model):
     __tablename__ = 'Actor'

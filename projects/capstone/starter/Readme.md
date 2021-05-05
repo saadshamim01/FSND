@@ -2,6 +2,8 @@
 
 You can setup the website by following the setup instructions.
 
+Heroku hosting address: https://capstone-1998.herokuapp.com/
+
 ## Setup
 
 Clone the repository in your computer using this [link](). Before starting the project you need to download the necessary plugins using.
@@ -157,16 +159,58 @@ Executive Producer
 }
 ```
 
-#### DELETE '/questions/<int:question_id>'
-- Fetches the questions list after deleting a selected question
-- Request Arguments: question_id
-- Results are paginated.
-- Returns an object with questions deleted question id, list, success status and total number of questions.
+#### DELETE '/actors/<int:actor_id>'
+- Deletes an object with id, name, age, gender success status.
+- Request Arguments: actor_id
+- Returns an object with with id, name, age, gender success status.
 
-- Curl sample: curl -X DELETE http://127.0.0.1:5000/questions/5
+- Curl sample: curl -X DELETE http://127.0.0.1:5000/actors/5
+
+```
+{
+  "delete": {
+    "id": 1,
+    "release_date": "Thu, 12 Dec 2002 00:00:00 GMT",
+    "title": "Movie 2"
+  },
+  "success": true
+}
+```
+
+#### DELETE '/movies/<int:movie_id>'
+- Deletes an object with id, title, date and success status.
+- Request Arguments: movie_id
+- Returns an object with with success status, id, release date and title.
+
+- Curl sample: curl -X DELETE http://127.0.0.1:5000/movies/5
+
+```
+{
+  "delete": {
+    "id": 1,
+    "release_date": "Thu, 12 Dec 2002 00:00:00 GMT",
+    "title": "Movie 2"
+  },
+  "success": true
+}
+```
+
+## Setting up Auth0
+
+- Get the required field information Auth0 Dashboard.
+- Add your domain name, API Audience, Client Secret, Algorithm and API Audience in the setup.sh.
+
+- export FLASK_APP=app.py
+- export DATABASE_URL='DATABASE_URL'
+- export AUTH0_DOMAIN='AUTH0_DOMAIN'
+- export ALGORITHMS=['ALGORITHMS']
+- export API_AUDIENCE='API_AUDIENCE'
+- export CLIENT_SECRET='CLIENT_SECRET'
 
 
-## Authentication
+## Auth0 Authentication
+
+#### URL: https://fsnd1998.us.auth0.com/authorize?audience=capstone_api&response_type=token&client_id=ZZRyeiTcfHLMlcSBWXpgZJreS3bNdEvb&redirect_uri=http://127.0.0.1:5000
 
 #### Casting Assistant
 
@@ -254,11 +298,10 @@ When the APIs failed to do what they design to do, we get errors. Errors are ret
                    }), 405
 ```
 
-## Testing
-To run the tests, run the following codes:
+###Testing
+
+To run the api test, create a database using
 ```
-dropdb trivia_test
-createdb trivia_test
-psql trivia_test < trivia.psql
-python test_flaskr.py
+createdb capstone_test
+python3 test_app.py
 ```

@@ -18,7 +18,18 @@ def create_app(test_config=None):
     setup_db(app)
     db = SQLAlchemy(app)
     migrate = Migrate(app, db)
-    #CORS(app)
+#    CORS(app)
+#
+#    @app.after_request
+#    def after_request(response):
+#        response.headers.add(
+#            'Access-Control-Allow-Headers', 'Content-Type, Authorization, true'
+#        )
+#        response.headers.add(
+#            'Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS'
+#        )
+#        response.headers.add('Access-Control-Allow-origins', '*')
+#        return response
 
 
     @app.route('/')
@@ -63,7 +74,7 @@ def create_app(test_config=None):
                        "Movie": movie
                        }), 200
         #curl -X GET http://127.0.0.1:5000/movies
-        #curl -X GET http://127.0.0.1:5000/movies --header 'authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Im5pdUhhd0JjNmxoeExFV1BULVY2aiJ9.eyJpc3MiOiJodHRwczovL2ZzbmQxOTk4LnVzLmF1dGgwLmNvbS8iLCJzdWIiOiJhdXRoMHw2MDhjYmUzZThiZTIxZDAwNzAxMjU2NzAiLCJhdWQiOiJjYXBzdG9uZV9hcGkiLCJpYXQiOjE2MTk5NTYxNzEsImV4cCI6MTYxOTk2MzM3MSwiYXpwIjoiWlpSeWVpVGNmSExNbGNTQldYcGdaSnJlUzNiTmRFdmIiLCJzY29wZSI6IiIsInBlcm1pc3Npb25zIjpbImdldDphY3RvcnMiLCJnZXQ6IG1vdmllcyJdfQ.f2o83HpWveysEG9KNODirR1aibQWahuzFhRtqt09qhjla_QHnsP4sDumumfJoZYYZq5u-_KL0IGnazn_TIKGPDzGJ_84vmF5sZzpJb90QFHYSo8k9ho2R9zZPMVucxMzws4kHMm-PZMADOpkpilMGmi4InArj95d8bGLkXwNLB_tLI6saUMZ6FVPPDIGSdChC-W-m7xFd2CWDnaDdPQjUspPOPl2SjHfO9ftibIcj_mBZ446xxhPQw4wSH6VBXDaFS6VBd3EG477G0H5SLV8sB48nOYD9iLxcmAG_hTIjHMCuF9zhtNX_Gw7V-Rayy-g2JCvzcim2WHq9ZQxsg-vYA'
+        #curl -X GET http://127.0.0.1:5000/movies --header 'authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Im5pdUhhd0JjNmxoeExFV1BULVY2aiJ9.eyJpc3MiOiJodHRwczovL2ZzbmQxOTk4LnVzLmF1dGgwLmNvbS8iLCJzdWIiOiJhdXRoMHw2MDhjYmU5NGUzNTI1NjAwNzE3NmE3N2MiLCJhdWQiOiJjYXBzdG9uZV9hcGkiLCJpYXQiOjE2MjAxMDE1NjksImV4cCI6MTYyMDEwODc2OSwiYXpwIjoiWlpSeWVpVGNmSExNbGNTQldYcGdaSnJlUzNiTmRFdmIiLCJzY29wZSI6IiIsInBlcm1pc3Npb25zIjpbImRlbGV0ZTogYWN0b3IiLCJkZWxldGU6IG1vdmllIiwiZ2V0OiBhY3RvcnMiLCJnZXQ6IG1vdmllcyIsInBhdGNoOiBhY3RvciIsInBhdGNoOiBtb3ZpZSIsInBvc3Q6IGFjdG9yIiwicG9zdDogbW92aWUiXX0.JR8drN93slBiVCJ46_7S2yua7AVgeC0WlMjoV_vrKh5tBSk5Kv9diY2FP5QYX1x0NspqMqO6gp1roUC4M2JnPsAYrcWXcdyfgOGK-AeRv9uSkj4uQfc77vReGAbTRte-_K3VOBgUGrcRJUXJHrk9T50nd53Z3taQaNH9EEDRA6qnYPn-QRdB8rla_n6ctStBWloC6MXCPJ4_gcC0JaGhNbRoT_EoiVG9Kz2AyEov4Hn8marLs2tR4LRo7YluRePcQ57bx37OVbmPmypj2PgDV5ShByxU_DVIWKRcOKs-ZU6lMeScIAjDcp1hDP3rO1LVCeT-th2kmzmL1pdDyaWb7g'
 
 ######################### Two delete requests
 
@@ -265,15 +276,13 @@ def create_app(test_config=None):
                    "message": "internal server error."
                      }), 500
 
-### JWT Errors
+# JWT Errors
     @app.errorhandler(401)
     def unauthorized_request(error):
       return jsonify({
                      "success": False,
                      "error": 401,
                      "message": "unauthorized request"
-
-
                      })
 
     @app.errorhandler(403)
@@ -294,7 +303,8 @@ def create_app(test_config=None):
 
     return app
 
-    app = create_app()
+#    app = create_app()
+app = create_app()
 
 #    if __name__ == '__main__':
 #        APP.run(host='0.0.0.0', port=8080, debug=True)
